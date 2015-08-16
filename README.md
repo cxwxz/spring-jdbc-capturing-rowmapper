@@ -8,7 +8,7 @@ ORM is a pain in the ass. This solves one simple problem in object-relation-mapp
 Consider having Person which has Nationality.
 
 Person.java
-```
+```java
 public class Person {
     private String name;
     private int age;
@@ -18,7 +18,7 @@ public class Person {
 ```
 
 Country.java
-```
+```java
 public class Country {
 
     private Integer id;
@@ -32,7 +32,7 @@ It's nice java-model. Now, you probably have daos for both. PersonDAO depends on
 countries can exist in various other contexts as well.
 
 Let's build sql-schema.
-```
+```sql
 CREATE TABLE COUNTRY (id INTEGER PRIMARY KEY, name VARCHAR);
 CREATE TABLE PERSONS (
   id INTEGER PRIMARY KEY,
@@ -46,7 +46,7 @@ Let's implement getPersons() to PersonDAO.
 
 You could do this because anonymous RowMapper can refer to countryDao instance in PersonDAO. 
 
-```
+```java
 @Repository
 public class PersonDAO {
 
