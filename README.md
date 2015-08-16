@@ -132,7 +132,7 @@ used in variety of other places you have a problem.
 
         // Populate countries using capturing row mapper.
         // Note the capturingRowMapper.captured()-call. It returns id_country which
-        // was at same row that person instance was created from.
+        // was at the same row that person instance was created from.
         for (Person person : persons) {
             person.setNationality(
                     nationalityDao.getNationality(
@@ -143,4 +143,6 @@ used in variety of other places you have a problem.
     }
 ```
 
-I think above is pretty ok solution for a single problem in orm.
+I think above is pretty ok solution for a single problem in orm. This base class can be used in static row mappers as well.
+
+Other possible solution is to use database dto:s, but this leads to more code. From anonymous RowMappers one can place values to final AtomicReference value variables. This gets tricky when mapping multiple objects and it does not support static row-mapper classes.
