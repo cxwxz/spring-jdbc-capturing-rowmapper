@@ -77,7 +77,7 @@ pool or create one. This is highly unwanted because it can lead to really weird 
 
 You can do this:
 Person.java
-```
+```java
 public class Person {
     private String name;
     private int age;
@@ -91,7 +91,7 @@ Now you have several problems. This is total load of bollocks because you want t
 and simple as possible. Don't do something like this. EVER.
 
 Good solution for this is to use natural sql-based solution. Joins.
-```
+```java
     public List<Person> getPersons() {
         List<Person> persons = jt.query("SELECT * FROM persons AS p JOIN country AS c ON p.id_country = c.id", new RowMapper<Person>() {
             public Person mapRow(ResultSet resultSet, int i) throws SQLException {
@@ -113,7 +113,7 @@ used in variety of other places you have a problem.
 
 ## Solution
 
-```
+```java
     public List<Person> getPersons() {
         // Build stateful row mapper which captures id_country
         CapturingRowMapper<Person> capturingRowMapper = new CapturingRowMapper<Person>("id_country") {
