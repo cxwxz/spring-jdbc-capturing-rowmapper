@@ -60,17 +60,33 @@ public class CapturingRowMapperTest {
         for (int i = 0; i < 1000; i++) {
             capturingRowMapper.mapRow(this.resultSetMock, i);
         }
+    }
 
+    @Test(expected = CapturingRowMapperException.class)
+    public void testWhenColumnDoesNotExistInResultSet() throws SQLException {
+
+        when(this.resultSetMock.getObject(anyString())).thenThrow(new SQLException());
+
+        CapturingRowMapper capturingRowMapper = new CapturingRowMapper("field1") {
+            @Override
+            public Object mapBaseObject(ResultSet resultSet, int i) throws SQLException {
+                return new TestDomainObject();
+            }
+        };
+
+        capturingRowMapper.mapRow(this.resultSetMock, 0);
     }
 
     @Test(expected = CapturingRowMapperException.class)
     public void assertThrowsIfMapBaseObjectReturnsNull() throws Exception {
+
         CapturingRowMapper capturingRowMapper = new CapturingRowMapper("field1") {
             @Override
             public Object mapBaseObject(ResultSet resultSet, int i) throws SQLException {
                 return null;
             }
         };
+
         capturingRowMapper.mapRow(this.resultSetMock, 0);
     }
 
@@ -85,6 +101,7 @@ public class CapturingRowMapperTest {
                 return testObject;
             }
         };
+
         TestDomainObject o = capturingRowMapper.mapRow(this.resultSetMock, 0);
 
         assertSame(testObject, o);

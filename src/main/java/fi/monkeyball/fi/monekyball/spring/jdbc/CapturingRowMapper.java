@@ -15,8 +15,13 @@ import java.util.HashMap;
  */
 public abstract class CapturingRowMapper<T> implements RowMapper<T> {
 
+    /** A special object for marking null in result set  */
     private static final Object CAPTURED_NULL = new Object();
+
+    /** column names which are captured  */
     private final String[] capturedFieldKeys;
+
+    /** Captured values by object */
     private final HashMap<Integer, HashMap<String, Object>> capturedValues = new HashMap<>();
 
     public CapturingRowMapper(String ... capturedFieldKeys) {
@@ -24,15 +29,16 @@ public abstract class CapturingRowMapper<T> implements RowMapper<T> {
     }
 
     @Override
-    public T mapRow(ResultSet resultSet, int i) throws SQLException {
+    public final T mapRow(ResultSet resultSet, int i) throws SQLException {
         // Map base object
         T baseObject = mapBaseObject(resultSet, i);
-        // Row mappers can'baseObject return null
+        // Row mappers can't return null
         if(baseObject == null) {
             throw new CapturingRowMapperException("CapturingRowMapper mapBaseObject returned null");
         }
         // Capture fields
         captureFieldsFromResultSet(resultSet, baseObject);
+        // Return base object
         return baseObject;
     }
 
@@ -41,7 +47,16 @@ public abstract class CapturingRowMapper<T> implements RowMapper<T> {
         this.capturedValues.put(baseObject.hashCode(), new HashMap<>());
         // Capture fields
         for (String capturedFieldKey : capturedFieldKeys) {
-            saveCapturedValue(baseObject, capturedFieldKey, resultSet.getObject(capturedFieldKey));
+            saveCapturedValue(baseObject, capturedFieldKey, getCapturedValueFromResultSet(resultSet, capturedFieldKey));
+        }
+    }
+
+    private Object getCapturedValueFromResultSet(ResultSet resultSet, String capturedFieldKey) {
+        try {
+            return resultSet.getObject(capturedFieldKey);
+        } catch (SQLException e) {
+            // SQLException was thrown, wrap it as a CapturingRowMapperException
+            throw new CapturingRowMapperException("Error while capturing field " + capturedFieldKey, e);
         }
     }
 
@@ -50,7 +65,6 @@ public abstract class CapturingRowMapper<T> implements RowMapper<T> {
         if(capturedObject == null) {
             capturedObject = CAPTURED_NULL;
         }
-
         this.capturedValues.get(t.hashCode()).put(capturedFieldKey, capturedObject);
     }
 
