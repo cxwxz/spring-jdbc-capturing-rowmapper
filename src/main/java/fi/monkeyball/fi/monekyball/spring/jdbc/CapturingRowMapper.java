@@ -7,6 +7,10 @@ import java.sql.SQLException;
 import java.util.HashMap;
 
 /**
+ * It's a abstract RowMapper which "captures" fields in result set for later use. Implement
+ * T mapBaseObject(ResultSet resultSet, int i) which should return actual object from query.
+ *
+ *
  * Created by juhof on 15/08/15.
  */
 public abstract class CapturingRowMapper<T> implements RowMapper<T> {
@@ -36,7 +40,7 @@ public abstract class CapturingRowMapper<T> implements RowMapper<T> {
 
     public abstract T mapBaseObject(ResultSet resultSet, int i) throws SQLException;
 
-    public <V extends Object> V  captured(T object, String fieldName, Class<V> expectedClass) {
+    public <V> V  captured(T object, String fieldName, Class<V> expectedClass) {
 
         V value = (V) this.capturedValues.get(object.hashCode()).get(fieldName);
         if(value == null) {
