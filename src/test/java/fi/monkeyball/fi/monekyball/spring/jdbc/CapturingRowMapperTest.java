@@ -75,7 +75,7 @@ public class CapturingRowMapperTest {
     }
 
     @Test
-    public void assertRetursSameExactObjectReturnedFromMapBaseObject() throws SQLException {
+    public void assertReturnsSameExactObjectReturnedFromMapBaseObject() throws SQLException {
 
         final TestDomainObject testObject = new TestDomainObject();
 
@@ -99,12 +99,12 @@ public class CapturingRowMapperTest {
 
         CapturingRowMapper<TestDomainObject> capturingRowMapper =
                 new CapturingRowMapper<TestDomainObject>("field1", "field2", "field3") {
-
                     @Override
-            public TestDomainObject mapBaseObject(ResultSet resultSet, int i) throws SQLException {
-                return new TestDomainObject();
-            }
-        };
+                    public TestDomainObject mapBaseObject(ResultSet resultSet, int i) throws SQLException {
+                        return new TestDomainObject();
+                    }
+                };
+
         TestDomainObject testDomainObject = capturingRowMapper.mapRow(this.resultSetMock, 0);
 
         assertEquals("Value of field 1", capturingRowMapper.captured(testDomainObject, "field1", String.class));
@@ -122,6 +122,7 @@ public class CapturingRowMapperTest {
                         return new TestDomainObject();
                     }
                 };
+
         TestDomainObject testDomainObject = capturingRowMapper.mapRow(this.resultSetMock, 0);
 
         capturingRowMapper.captured(testDomainObject, "field1", String.class);
@@ -139,9 +140,28 @@ public class CapturingRowMapperTest {
                         return new TestDomainObject();
                     }
                 };
+
         TestDomainObject testDomainObject = capturingRowMapper.mapRow(this.resultSetMock, 0);
 
         capturingRowMapper.captured(testDomainObject, "field1", Integer.class);
+    }
+
+    @Test
+    public void whatHappensIfResultSetReturnsNull() throws SQLException {
+
+        when(this.resultSetMock.getObject("field1")).thenReturn(null);
+
+        CapturingRowMapper<TestDomainObject> capturingRowMapper =
+                new CapturingRowMapper<TestDomainObject>("field1") {
+                    @Override
+                    public TestDomainObject mapBaseObject(ResultSet resultSet, int i) throws SQLException {
+                        return new TestDomainObject();
+                    }
+                };
+
+        TestDomainObject testDomainObject = capturingRowMapper.mapRow(this.resultSetMock, 0);
+
+        assertNull(capturingRowMapper.captured(testDomainObject, "field1", Integer.class));
     }
 
     @Test
@@ -158,6 +178,7 @@ public class CapturingRowMapperTest {
                         return new TestDomainObject();
                     }
                 };
+
         TestDomainObject firstMappedObject = capturingRowMapper.mapRow(this.resultSetMock, 0);
         TestDomainObject secondsMappedObject = capturingRowMapper.mapRow(this.resultSetMock, 1);
 
