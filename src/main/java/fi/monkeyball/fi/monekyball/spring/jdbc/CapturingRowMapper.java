@@ -28,12 +28,15 @@ public abstract class CapturingRowMapper<T> implements RowMapper<T> {
         if(t == null) {
             throw new CapturingRowMapperException("CapturingRowMapper mapBaseObject returned null");
         }
+        captureFieldsFromResultSet(resultSet, t);
+        return t;
+    }
+
+    private void captureFieldsFromResultSet(ResultSet resultSet, T t) throws SQLException {
         this.capturedValues.put(t.hashCode(), new HashMap<>());
         for (String capturedFieldKey : capturedFieldKeys) {
             this.capturedValues.get(t.hashCode()).put(capturedFieldKey, resultSet.getObject(capturedFieldKey));
         }
-
-        return t;
     }
 
     public abstract T mapBaseObject(ResultSet resultSet, int i) throws SQLException;
