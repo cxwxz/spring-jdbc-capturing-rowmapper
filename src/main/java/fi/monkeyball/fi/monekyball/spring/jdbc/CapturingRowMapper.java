@@ -28,9 +28,7 @@ public abstract class CapturingRowMapper<T> implements RowMapper<T> {
         if(t == null) {
             throw new CapturingRowMapperException("CapturingRowMapper mapBaseObject returned null");
         }
-        if(!this.capturedValues.containsKey(t.hashCode())) {
-            this.capturedValues.put(t.hashCode(), new HashMap<>());
-        }
+        this.capturedValues.put(t.hashCode(), new HashMap<>());
         for (String capturedFieldKey : capturedFieldKeys) {
             this.capturedValues.get(t.hashCode()).put(capturedFieldKey, resultSet.getObject(capturedFieldKey));
         }
